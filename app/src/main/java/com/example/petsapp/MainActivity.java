@@ -41,6 +41,15 @@ public class MainActivity extends AppCompatActivity {
         displayDatabaseInfo();
     }
 
+    /**
+     * This function is mostly called when user return from another activity
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        displayDatabaseInfo();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_catalog.xml file.
@@ -80,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " + PetsEntry.TABLE_NAME, null);
+        Cursor cursor = db.query(PetsEntry.TABLE_NAME, null, null, null, null, null, null);
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
