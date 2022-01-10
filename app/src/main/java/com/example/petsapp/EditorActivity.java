@@ -1,5 +1,7 @@
 package com.example.petsapp;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +13,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.example.petsapp.data.PetsContract.PetsEntry;
+
+import com.example.petsapp.data.PetsContract;
+import com.example.petsapp.data.PetsDbHelper;
 
 public class EditorActivity extends AppCompatActivity {
     /** EditText field to enter the pet's name */
@@ -66,11 +73,11 @@ public class EditorActivity extends AppCompatActivity {
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.gender_male))) {
-                        mGender = 1; // Male
+                        mGender = PetsContract.PetsEntry.GENDER_MALE; // Male
                     } else if (selection.equals(getString(R.string.gender_female))) {
-                        mGender = 2; // Female
+                        mGender = PetsContract.PetsEntry.GENDER_FEMALE; // Female
                     } else {
-                        mGender = 0; // Unknown
+                        mGender = PetsContract.PetsEntry.GENDER_UNKNOWN; // Unknown
                     }
                 }
             }
@@ -97,7 +104,7 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                // Do 
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
@@ -110,5 +117,25 @@ public class EditorActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void insertPetInformation(){
+        // Storing values from user into variables
+        String petName = mNameEditText.getText().toString().trim();
+        String petBreed = mBreedEditText.getText().toString().trim();
+        int petWeight = Integer.parseInt(mBreedEditText.getText().toString().trim());
+        int petGender = Integer.parseInt(mGenderSpinner.getSelectedItem().toString());
+
+        // creating Content value to add tuple into database
+        ContentValues values = new ContentValues();
+        values.put(PetsEntry.COLUMN_PET_NAME, petName);
+        values.put(PetsEntry.COLUMN_PET_BREED, petBreed);
+        values.put(PetsEntry.COLUMN_PET_GENDER,petGender);
+        values.put(PetsEntry.COLUMN_PET_WEIGHT, petWeight);
+
+        // Adding the tuple into the database
+        PetsDbHelper mDbHelper = new PetsDbHelper(this);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.insert(PetsEntry.TABLE_NAME, null, values);
     }
 }
