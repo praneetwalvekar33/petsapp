@@ -95,6 +95,29 @@ public class MainActivity extends AppCompatActivity {
             // pets table in the database).
             TextView displayView = (TextView) findViewById(R.id.text_view_pet);
             displayView.setText("Number of rows in pets database table: " + cursor.getCount());
+            displayView.append(PetsEntry._ID + "-" + PetsEntry.COLUMN_PET_NAME + "-" +
+                    PetsEntry.COLUMN_PET_BREED + "-" + PetsEntry.COLUMN_PET_GENDER + "-" +
+                    PetsEntry.COLUMN_PET_WEIGHT);
+            // Index of the columns in the cursor object
+            int petIdIdex = cursor.getColumnIndex(PetsEntry._ID);
+            int petsNameIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_NAME);
+            int petsBreedIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_BREED);
+            int petsGenderIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_GENDER);
+            int petsWeightIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_WEIGHT);
+
+            // Using while loop we will iterate through all the values in the cusor object
+            while(cursor.moveToNext()){
+                // Values of each column in a tuple
+                int petId = cursor.getInt(petIdIdex);
+                String petName = cursor.getString(petsNameIndex);
+                String petBreed = cursor.getString(petsBreedIndex);
+                int petGender = cursor.getInt(petsGenderIndex);
+                int petWeight = cursor.getInt(petsWeightIndex);
+
+                // Displaying the values on the screen
+                displayView.append("\n" + petId + "-" + petName + "-" + petBreed + "-" + petGender + "-" +
+                        "-" + petWeight +"\n");
+            }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
