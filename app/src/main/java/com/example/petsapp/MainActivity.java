@@ -87,9 +87,16 @@ public class MainActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
+        String[] projection = {PetsEntry._ID,
+                            PetsEntry.COLUMN_PET_NAME,
+                            PetsEntry.COLUMN_PET_BREED,
+                            PetsEntry.COLUMN_PET_GENDER,
+                            PetsEntry.COLUMN_PET_WEIGHT};
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.query(PetsEntry.TABLE_NAME, null, null, null, null, null, null);
+        //Cursor cursor = db.query(PetsEntry.TABLE_NAME, null, null, null, null, null, null);
+
+        Cursor cursor = getContentResolver().query(PetsEntry.CONTENT_URI,projection, null, null, null);
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
