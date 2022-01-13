@@ -36,6 +36,18 @@ public final class PetsContract {
         public static final  int GENDER_UNKNOWN = 0;
         public static final  int GENDER_MALE = 1;
         public static final int GENDER_FEMALE= 2;
+
+        /**
+         * Method check whether passed value is selected from the mentioned choices
+         * @param gender  Integer value
+         * @return        boolean value
+         */
+        public static boolean isValidGender(Integer gender){
+            if(gender == GENDER_MALE || gender == GENDER_FEMALE || gender == GENDER_UNKNOWN){
+                return true;
+            }
+            return false;
+        }
     }
 
 }
