@@ -2,6 +2,7 @@ package com.example.petsapp;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -139,15 +140,14 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetsEntry.COLUMN_PET_WEIGHT, petWeight);
 
         // Adding the tuple into the database
-        PetsDbHelper mDbHelper = new PetsDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long newRowId = db.insert(PetsEntry.TABLE_NAME, null, values);
+        Uri newRowUri = getContentResolver().insert(PetsEntry.CONTENT_URI, values);
 
-        if(newRowId == -1){
-            Toast.makeText(this, "Error with saving pet information", Toast.LENGTH_SHORT).show();
+        // If the Uri value is null show in toast message that insertion failed
+        if(newRowUri == null){
+            Toast.makeText(this, getString(R.string.editor_insert_pet_failed), Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(this,"Information of the pet saved with row ID: " + newRowId, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,getString(R.string.editor_insert_pet_successful) + newRowUri, Toast.LENGTH_SHORT).show();
         }
 
     }

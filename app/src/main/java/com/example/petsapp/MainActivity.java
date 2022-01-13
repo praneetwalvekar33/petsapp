@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -144,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
         values.put(PetsEntry.COLUMN_PET_WEIGHT, 7);
 
         // Inserting the tuples in the database
-        long newRowId = db.insert(PetsEntry.TABLE_NAME, null, values);
+        Uri newRowUri = getContentResolver().insert(PetsEntry.CONTENT_URI, values);
 
-        Log.v("MainActivity", "New row added" + newRowId);
+        Log.v("MainActivity", "New row added" + newRowUri);
     }
 }
