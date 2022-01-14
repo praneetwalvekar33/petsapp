@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.petsapp.data.PetsDbHelper;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         displayDatabaseInfo();
     }
 
@@ -101,11 +103,15 @@ public class MainActivity extends AppCompatActivity {
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
-            TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText("Number of rows in pets database table: " + cursor.getCount());
-            displayView.append(PetsEntry._ID + "-" + PetsEntry.COLUMN_PET_NAME + "-" +
-                    PetsEntry.COLUMN_PET_BREED + "-" + PetsEntry.COLUMN_PET_GENDER + "-" +
-                    PetsEntry.COLUMN_PET_WEIGHT);
+            ListView listView = (ListView) findViewById(R.id.list_view);
+
+
+            //TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+            //displayView.setText("Number of rows in pets database table: " + cursor.getCount());
+            //displayView.append(PetsEntry._ID + "-" + PetsEntry.COLUMN_PET_NAME + "-" +
+            //        PetsEntry.COLUMN_PET_BREED + "-" + PetsEntry.COLUMN_PET_GENDER + "-" +
+            //        PetsEntry.COLUMN_PET_WEIGHT);
+
             // Index of the columns in the cursor object
             int petIdIdex = cursor.getColumnIndex(PetsEntry._ID);
             int petsNameIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_NAME);
@@ -113,18 +119,30 @@ public class MainActivity extends AppCompatActivity {
             int petsGenderIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_GENDER);
             int petsWeightIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_WEIGHT);
 
+            //cursor.moveToNext();
+            // Values of each column in a tuple
+            //int petId = cursor.getInt(petIdIdex);
+            //String petName = cursor.getString(petsNameIndex);
+            //String petBreed = cursor.getString(petsBreedIndex);
+            //int petGender = cursor.getInt(petsGenderIndex);
+            //int petWeight = cursor.getInt(petsWeightIndex);
+
+            PetsCursorAdapter petsAdapter = new PetsCursorAdapter(this, cursor);
+            listView.setAdapter(petsAdapter);
+
             // Using while loop we will iterate through all the values in the cusor object
             while(cursor.moveToNext()){
                 // Values of each column in a tuple
-                int petId = cursor.getInt(petIdIdex);
-                String petName = cursor.getString(petsNameIndex);
-                String petBreed = cursor.getString(petsBreedIndex);
-                int petGender = cursor.getInt(petsGenderIndex);
-                int petWeight = cursor.getInt(petsWeightIndex);
+                //petId = cursor.getInt(petIdIdex);
+                //petName = cursor.getString(petsNameIndex);
+                //petBreed = cursor.getString(petsBreedIndex);
+                //petGender = cursor.getInt(petsGenderIndex);
+                //petWeight = cursor.getInt(petsWeightIndex);
 
-                // Displaying the values on the screen
-                displayView.append("\n" + petId + "-" + petName + "-" + petBreed + "-" + petGender + "-" +
-                        "-" + petWeight +"\n");
+                                // Displaying the values on the screen
+                //displayView.append("\n" + petId + "-" + petName + "-" + petBreed + "-" + petGender + "-" +
+                //        "-" + petWeight +"\n");
+                petsAdapter.changeCursor(cursor);
             }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
