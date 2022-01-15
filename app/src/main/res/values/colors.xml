@@ -9,6 +9,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <!-- The text color for pet's name -->
+    <color name="petnametextcolor">#2B3D4D</color>
+
+    <!-- The text color for the pet's breed -->
+    <color name="petbreedtextcolor">#AEB6BD</color>
+
+    <!-- The text color for the subtitle in an empty view  -->
+    <color name="subtitletextcolor">#A2AAB0</color>
+
     <!-- The app branding color for the app bar -->
     <color name="colorPrimary">#F0514B</color>
 

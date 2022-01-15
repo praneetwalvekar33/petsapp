@@ -7,11 +7,15 @@
         android:id="@+id/name_of_pet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:fontFamily="sans-serif-medium"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/petnametextcolor"/>
     <TextView
         android:id="@+id/breed_of_pet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:fontFamily="sans-serif-medium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/petbreedtextcolor"/>
 
 </LinearLayout>

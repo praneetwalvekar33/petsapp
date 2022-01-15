@@ -95,60 +95,24 @@ public class MainActivity extends AppCompatActivity {
                             PetsEntry.COLUMN_PET_BREED,
                             PetsEntry.COLUMN_PET_GENDER,
                             PetsEntry.COLUMN_PET_WEIGHT};
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        //Cursor cursor = db.query(PetsEntry.TABLE_NAME, null, null, null, null, null, null);
 
+        // Cursor containing the list of tuples from querying the database
         Cursor cursor = getContentResolver().query(PetsEntry.CONTENT_URI,projection, null, null, null);
-        try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            ListView listView = (ListView) findViewById(R.id.list_view);
 
+        // ListView which will be populated with the pets data
+        ListView listView = (ListView) findViewById(R.id.list_view);
 
-            //TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            //displayView.setText("Number of rows in pets database table: " + cursor.getCount());
-            //displayView.append(PetsEntry._ID + "-" + PetsEntry.COLUMN_PET_NAME + "-" +
-            //        PetsEntry.COLUMN_PET_BREED + "-" + PetsEntry.COLUMN_PET_GENDER + "-" +
-            //        PetsEntry.COLUMN_PET_WEIGHT);
+        // View which will be displayed on ListView when there is no data present in cursor adapter
+        View emptyView = findViewById(R.id.empty_list_view);
 
-            // Index of the columns in the cursor object
-            int petIdIdex = cursor.getColumnIndex(PetsEntry._ID);
-            int petsNameIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_NAME);
-            int petsBreedIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_BREED);
-            int petsGenderIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_GENDER);
-            int petsWeightIndex = cursor.getColumnIndex(PetsEntry.COLUMN_PET_WEIGHT);
+        // Setting up a empty view for the ListView
+        listView.setEmptyView(emptyView);
 
-            //cursor.moveToNext();
-            // Values of each column in a tuple
-            //int petId = cursor.getInt(petIdIdex);
-            //String petName = cursor.getString(petsNameIndex);
-            //String petBreed = cursor.getString(petsBreedIndex);
-            //int petGender = cursor.getInt(petsGenderIndex);
-            //int petWeight = cursor.getInt(petsWeightIndex);
+        // Setup of CurosrAdapter for creating a view for each pets from cursor data
+        PetsCursorAdapter petsAdapter = new PetsCursorAdapter(this, cursor);
 
-            PetsCursorAdapter petsAdapter = new PetsCursorAdapter(this, cursor);
-            listView.setAdapter(petsAdapter);
-
-            // Using while loop we will iterate through all the values in the cusor object
-            while(cursor.moveToNext()){
-                // Values of each column in a tuple
-                //petId = cursor.getInt(petIdIdex);
-                //petName = cursor.getString(petsNameIndex);
-                //petBreed = cursor.getString(petsBreedIndex);
-                //petGender = cursor.getInt(petsGenderIndex);
-                //petWeight = cursor.getInt(petsWeightIndex);
-
-                                // Displaying the values on the screen
-                //displayView.append("\n" + petId + "-" + petName + "-" + petBreed + "-" + petGender + "-" +
-                //        "-" + petWeight +"\n");
-                petsAdapter.changeCursor(cursor);
-            }
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
+        // Attaching adapter to the listview
+        listView.setAdapter(petsAdapter);
     }
 
     private void insertPetInformation(){
