@@ -5,6 +5,8 @@
       <map>
         <entry key="app/src/main/res/layout/activity_editor.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.26721014492753625" />
+        <entry key="app/src/main/res/layout/empty_view.xml" value="0.22826086956521738" />
+        <entry key="app/src/main/res/layout/pet_item.xml" value="0.15" />
         <entry key="app/src/main/res/menu/menu_catalog.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/menu/menu_editor.xml" value="0.16770833333333332" />
       </map>
