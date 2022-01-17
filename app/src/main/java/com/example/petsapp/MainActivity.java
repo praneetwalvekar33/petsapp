@@ -1,30 +1,39 @@
 package com.example.petsapp;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.petsapp.data.PetsDbHelper;
 import com.example.petsapp.data.PetsContract.PetsEntry;
+import com.example.petsapp.data.PetsDbHelper;
 
-//import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // To access our database, we instantiate our subclass of SQLiteOpenHelper
     // and pass the context, which is the current activity.
     PetsDbHelper mDbHelper = new PetsDbHelper(this);
+
+    private static final int PET_LOADER = 0;
+
+    PetsCursorAdapter mCursorAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +50,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        displayDatabaseInfo();
+        // Find ListView Which will be populated with pets data
+        ListView petListView = findViewById(R.id.list_view);
+
+        // Find the empty view used for ListView when no data is present
+        View petEmptyView = findViewById(R.id.empty_list_view);
+
+        // Setting an empty view on the ListView
+        petListView.setEmptyView(petEmptyView);
+
+        // Initializing the CursorAdapter
+        mCursorAdapter = new PetsCursorAdapter(this, null);
+
+        // Setting an CursorAdapter for ListView
+        petListView.setAdapter(mCursorAdapter);
+        
+        // Starting the loader
+        getLoaderManager().initLoader(PET_LOADER, null, this);
     }
 
-    /**
-     * This function is mostly called when user return from another activity
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayDatabaseInfo();
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
                 insertPetInformation();
-                displayDatabaseInfo();
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
@@ -78,42 +95,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
-     */
-    private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        //PetsDbHelper mDbHelper = new PetsDbHelper(this);
-
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String[] projection = {PetsEntry._ID,
-                            PetsEntry.COLUMN_PET_NAME,
-                            PetsEntry.COLUMN_PET_BREED,
-                            PetsEntry.COLUMN_PET_GENDER,
-                            PetsEntry.COLUMN_PET_WEIGHT};
-
-        // Cursor containing the list of tuples from querying the database
-        Cursor cursor = getContentResolver().query(PetsEntry.CONTENT_URI,projection, null, null, null);
-
-        // ListView which will be populated with the pets data
-        ListView listView = (ListView) findViewById(R.id.list_view);
-
-        // View which will be displayed on ListView when there is no data present in cursor adapter
-        View emptyView = findViewById(R.id.empty_list_view);
-
-        // Setting up a empty view for the ListView
-        listView.setEmptyView(emptyView);
-
-        // Setup of CurosrAdapter for creating a view for each pets from cursor data
-        PetsCursorAdapter petsAdapter = new PetsCursorAdapter(this, cursor);
-
-        // Attaching adapter to the listview
-        listView.setAdapter(petsAdapter);
-    }
 
     private void insertPetInformation(){
         // Getting data repository in write mode
@@ -130,5 +111,49 @@ public class MainActivity extends AppCompatActivity {
         Uri newRowUri = getContentResolver().insert(PetsEntry.CONTENT_URI, values);
 
         Log.v("MainActivity", "New row added" + newRowUri);
+    }
+
+    /**
+     * Creates a new CursorLoader
+     * @param i         Id for the CursorLoader to be used
+     * @param bundle    null values
+     * @return          CursorLoader
+     */
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+
+        // Projection that specifies the column of the table we want to query
+        String[] projection = {PetsEntry._ID,
+                PetsEntry.COLUMN_PET_NAME,
+                PetsEntry.COLUMN_PET_BREED};
+
+        //  Loader will execute the contentprovider's query method on a background thread
+        return new CursorLoader(this, PetsEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    /**
+     * The CursorLoader created in onCreateLoader is passed to this method to set the cursor
+     * @param loader    CursorLoader created in onCreateLoader
+     * @param cursor    Varible containing the tuple from database
+     */
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+        // Swap the CursorAdapter with new cursor
+        mCursorAdapter.swapCursor(cursor);
+    }
+
+    /**
+     * Method resets the CursorLoader
+     * @param loader    CursorLoader to be reseted
+     */
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        // Swap the CursorAdapter's cursor with null value
+        mCursorAdapter.swapCursor(null);
     }
 }
