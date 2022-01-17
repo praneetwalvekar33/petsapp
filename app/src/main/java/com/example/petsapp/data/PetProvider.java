@@ -59,9 +59,11 @@ public class PetProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match){
             case PETS:
+                // Queries the entire database.
                 cursor = db.query(PetsContract.PetsEntry.TABLE_NAME, projection,selection, selectionArgs, null, null, sortOrder);
                 break;
             case PET_ID:
+                // Queries a particlar row in the database.
                 selection = PetsEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = db.query(PetsEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
@@ -69,6 +71,9 @@ public class PetProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Cannot query illegal Uri: " + uri);
         }
+
+        // Setting a notification uri on the cursor to notify whenever the cusor value is changed.
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
@@ -130,6 +135,9 @@ public class PetProvider extends ContentProvider {
             Log.e(LOG_TAG, "Row is not inserted into the table for uri: " + uri);
             return null;
         }
+
+        // Notifies whenever there is some change in database for the provided uri
+        getContext().getContentResolver().notifyChange(uri, null);
 
         // Returns the Uri by adding the row at which insertion occured
         return ContentUris.withAppendedId(PetsEntry.CONTENT_URI,newRowId);
@@ -198,9 +206,16 @@ public class PetProvider extends ContentProvider {
             }
         }
 
-        // Updates the value in the table and returns the no. of rows effected
-        return db.update(PetsEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        // Updates the value in the table and gives the no. of rows effected
+        int rowsUpdated =db.update(PetsEntry.TABLE_NAME, contentValues, selection, selectionArgs);
 
+        if(rowsUpdated != 0){
+            // Notifies whenever there is some change in database for the provided uri
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // Returns no. of rows updated
+        return rowsUpdated;
     }
 
 
@@ -211,15 +226,32 @@ public class PetProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int match = sUriMatcher.match(uri);
+        int rowsDeleted;
         switch(match){
             case PETS:
                 // Delete all the values from the table
-                return db.delete(PetsEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(PetsEntry.TABLE_NAME, selection, selectionArgs);
+
+                if(rowsDeleted != 0){
+                    // Notifies whenever there is some change in database for the provided uri
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                // Returns no. of rows deleted
+                return rowsDeleted;
             case PET_ID:
                 // Deletes the rows that satisfy the condition
                 selection = PetsEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return db.delete(PetsEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(PetsEntry.TABLE_NAME, selection, selectionArgs);
+
+                if(rowsDeleted != 0){
+                    // Notifies whenever there is some change in database for the provided uri
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                // Returns no. of rows deleted
+                return rowsDeleted;
             default:
                 throw new IllegalArgumentException("Deletion cannot be done for illegal uri: " + uri);
         }
