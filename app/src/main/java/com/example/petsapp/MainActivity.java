@@ -1,6 +1,7 @@
 package com.example.petsapp;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.petsapp.data.PetsContract.PetsEntry;
@@ -30,10 +32,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     // and pass the context, which is the current activity.
     PetsDbHelper mDbHelper = new PetsDbHelper(this);
 
+    // Constant used as an id for the loader being used
+    // We onlu have one loader so it is set as constant value
     private static final int PET_LOADER = 0;
 
+    // Global variable for CursorLoader
     PetsCursorAdapter mCursorAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Setting an CursorAdapter for ListView
         petListView.setAdapter(mCursorAdapter);
-        
+
+        // Setting a ClickListener on each item in the  ListView
+        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Creating Uri for the item clicked to retrive the data from that item
+                Uri petDataUri = ContentUris.withAppendedId(PetsEntry.CONTENT_URI,id);
+
+                // Intent to call EditorActivity from this activity
+                Intent editPetDataIntent =  new Intent(MainActivity.this, EditorActivity.class);
+
+                // Adding Uri of the clicked item in the intent
+                editPetDataIntent.setData(petDataUri);
+
+                // Starting the activity by passing the intent
+                startActivity(editPetDataIntent);
+            }
+        });
+
         // Starting the loader
         getLoaderManager().initLoader(PET_LOADER, null, this);
     }
