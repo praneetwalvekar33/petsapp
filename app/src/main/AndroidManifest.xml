@@ -13,7 +13,6 @@
         <activity
             android:name=".EditorActivity"
             android:exported="false"
-            android:label="@string/editor_activity_title_new_pet">
             android:parentActivityName=".MainActivity" >
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data

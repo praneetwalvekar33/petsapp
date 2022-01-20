@@ -1,11 +1,17 @@
 package com.example.petsapp;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +22,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.petsapp.data.PetsContract;
 import com.example.petsapp.data.PetsContract.PetsEntry;
 
-import com.example.petsapp.data.PetsContract;
-import com.example.petsapp.data.PetsDbHelper;
-
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     /** EditText field to enter the pet's name */
     private EditText mNameEditText;
 
@@ -34,15 +38,26 @@ public class EditorActivity extends AppCompatActivity {
     /** EditText field to enter the pet's gender */
     private Spinner mGenderSpinner;
 
+    // Id for the Loader being used
+    private static final int PET_LOADER = 0;
+
+    private Uri currentPetUri;
     /**
      * Gender of the pet. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
      */
     private int mGender = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        // Getting the intent used to call the EditorActivity
+        Intent intent = getIntent();
+
+        // Getting the extras present in the Intent
+        Uri currentPetUri = intent.getData();
 
         // Find all relevant views that we will need to read user input from
         mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
@@ -50,7 +65,18 @@ public class EditorActivity extends AppCompatActivity {
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
+        // Setting the spinner.
         setupSpinner();
+
+        // Checking if the intent have a string which can parsed as  an Uri
+        if(currentPetUri != null){
+            setTitle(R.string.editor_activity_title_edit_pet);
+            // Initializing the loader.
+            getLoaderManager().initLoader(PET_LOADER, null, this);
+        }
+        else{
+            setTitle(R.string.editor_activity_title_new_pet);
+        }
     }
 
     /**
@@ -149,6 +175,33 @@ public class EditorActivity extends AppCompatActivity {
         else{
             Toast.makeText(this,getString(R.string.editor_insert_pet_successful) + newRowUri, Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+
+        // The attributes we want to use in the edit pet activity
+        String[] projection = {PetsEntry._ID,
+                    PetsEntry.COLUMN_PET_NAME,
+                    PetsEntry.COLUMN_PET_BREED,
+                    PetsEntry.COLUMN_PET_GENDER,
+                    PetsEntry.COLUMN_PET_WEIGHT};
+        return new CursorLoader(this,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
 }
